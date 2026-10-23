@@ -134,8 +134,8 @@ components:
       required: [id, title, description, categoryId, status, locationDetails, createdAt]
       properties:
         id: { type: integer, format: int64 }
-        residentId: { type: integer, format: int64 }
-        blockId: { type: integer, format: int64 }
+        residentId: { type: string, format: uuid }
+        blockId: { type: string, format: uuid }
         blockName: { type: string }
         roomNumber: { type: string }
         title: { type: string }
