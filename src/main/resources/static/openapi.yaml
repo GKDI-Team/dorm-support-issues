@@ -30,7 +30,7 @@ paths:
     get:
       tags: [Issues]
       summary: List issues available to the current user
-      security: [{ SessionId: [] }]
+      security: [{ BearerAuth: [] }]
       parameters:
         - { name: status, in: query, schema: { type: string, enum: [NEW, IN_PROGRESS, CLOSED] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
@@ -50,7 +50,7 @@ paths:
     post:
       tags: [Issues]
       summary: Create an issue for the current resident
-      security: [{ SessionId: [] }]
+      security: [{ BearerAuth: [] }]
       requestBody:
         required: true
         content:
@@ -69,7 +69,7 @@ paths:
     get:
       tags: [Issues]
       summary: Get one issue
-      security: [{ SessionId: [] }]
+      security: [{ BearerAuth: [] }]
       parameters:
         - { name: issueId, in: path, required: true, schema: { type: integer, format: int64 } }
       responses:
@@ -83,7 +83,7 @@ paths:
     patch:
       tags: [Issues]
       summary: Change issue status
-      security: [{ SessionId: [] }]
+      security: [{ BearerAuth: [] }]
       parameters:
         - { name: issueId, in: path, required: true, schema: { type: integer, format: int64 } }
       requestBody:
@@ -102,10 +102,10 @@ paths:
         '409': { description: Invalid or conflicting status transition }
 components:
   securitySchemes:
-    SessionId:
-      type: apiKey
-      in: header
-      name: X-Session-Id
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     CreateIssueRequest:
       type: object
@@ -159,6 +159,6 @@ components:
         application/json:
           schema: { $ref: '#/components/schemas/Error' }
     Unauthorized:
-      description: Missing or invalid session
+      description: Missing, invalid or expired JWT
     Forbidden:
       description: Current role cannot perform this operation
