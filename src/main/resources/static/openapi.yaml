@@ -41,11 +41,8 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required: [items, total]
-                properties:
-                  items: { type: array, items: { $ref: '#/components/schemas/Issue' } }
-                  total: { type: integer, format: int64 }
+                type: array
+                items: { $ref: '#/components/schemas/Issue' }
         '401': { $ref: '#/components/responses/Unauthorized' }
     post:
       tags: [Issues]
@@ -99,7 +96,7 @@ paths:
               schema: { $ref: '#/components/schemas/Issue' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
-        '409': { description: Invalid or conflicting status transition }
+        '404': { description: Issue not found }
 components:
   securitySchemes:
     BearerAuth:
@@ -118,11 +115,10 @@ components:
         locationDetails: { type: string, minLength: 1, maxLength: 250 }
     ChangeStatusRequest:
       type: object
-      required: [status, expectedStatus]
+      required: [status]
       additionalProperties: false
       properties:
-        status: { type: string, enum: [IN_PROGRESS, CLOSED] }
-        expectedStatus: { type: string, enum: [NEW, IN_PROGRESS] }
+        status: { type: string, enum: [NEW, IN_PROGRESS, CLOSED] }
     Category:
       type: object
       required: [id, name]
@@ -136,7 +132,6 @@ components:
         id: { type: string, format: uuid }
         residentId: { type: string, format: uuid }
         blockId: { type: string, format: uuid }
-        blockName: { type: string }
         roomNumber: { type: string }
         title: { type: string }
         description: { type: string }
