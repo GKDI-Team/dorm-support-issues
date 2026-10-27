@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import org.springframework.validation.annotation.Validated;
 
 import java.net.URI;
 import java.util.List;
@@ -17,6 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/issues")
+@Validated
 public class IssueController {
     private final IssueService issueService;
 
@@ -32,8 +37,12 @@ public class IssueController {
     }
 
     @GetMapping
-    public List<IssueResponse> findAll(Authentication authentication) {
-        return issueService.findAll(authentication);
+    public List<IssueResponse> findAll(
+            @RequestParam(required = false) IssueStatus status,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(100) int limit,
+            @RequestParam(defaultValue = "0") @Min(0) @Max(100_000) int offset,
+            Authentication authentication) {
+        return issueService.findAll(authentication, status, limit, offset);
     }
 
     @GetMapping("/{issueId}")

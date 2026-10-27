@@ -9,6 +9,8 @@ import com.dormsupport.issues.history.IssueStatusHistoryRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.UUID;
@@ -55,11 +57,26 @@ public class IssueService {
     }
 
     @Transactional(readOnly = true)
-    public List<IssueResponse> findAll(Authentication authentication) {
+    public List<IssueResponse> findAll(Authentication authentication, IssueStatus status,
+                                       int limit, int offset) {
         UUID userId = userId(authentication);
-        List<Issue> issues = isStaff(authentication)
-                ? issueRepository.findAllByOrderByCreatedAtDesc()
-                : issueRepository.findByResidentIdOrderByCreatedAtDesc(userId);
+        PageRequest pageRequest = PageRequest.of(
+                0,
+                Math.addExact(offset, limit),
+                Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")));
+
+        List<Issue> issues;
+        if (isStaff(authentication)) {
+            issues = (status == null
+                    ? issueRepository.findAll(pageRequest)
+                    : issueRepository.findByStatus(status, pageRequest)).getContent();
+        } else {
+            issues = (status == null
+                    ? issueRepository.findByResidentId(userId, pageRequest)
+                    : issueRepository.findByResidentIdAndStatus(userId, status, pageRequest)).getContent();
+        }
+
+        issues = issues.stream().skip(offset).limit(limit).toList();
         return issues.stream().map(IssueResponse::from).toList();
     }
 
@@ -74,8 +91,8 @@ public class IssueService {
                                              Authentication authentication) {
         requireStaff(authentication);
         Issue issue = issueRepository.findById(issueId).orElseThrow(IssueNotFoundException::new);
-        if (issue.getStatus() == request.status()) {
-            throw new IssueStatusChangeNotAllowedException();
+        if (!issue.getStatus().canTransitionTo(request.status())) {
+            throw new InvalidIssueStatusTransitionException();
         }
 
         IssueStatus previousStatus = issue.getStatus();

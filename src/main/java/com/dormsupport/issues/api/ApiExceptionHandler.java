@@ -5,6 +5,7 @@ import com.dormsupport.issues.client.UserProfileNotFoundException;
 import com.dormsupport.issues.issue.IssueCategoryNotFoundException;
 import com.dormsupport.issues.issue.IssueNotFoundException;
 import com.dormsupport.issues.issue.IssueStatusChangeNotAllowedException;
+import com.dormsupport.issues.issue.InvalidIssueStatusTransitionException;
 import com.dormsupport.issues.issue.ResidentProfileIncompleteException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -56,6 +57,12 @@ public class ApiExceptionHandler {
     ResponseEntity<ApiError> statusChangeNotAllowed(IssueStatusChangeNotAllowedException exception) {
         return error(HttpStatus.FORBIDDEN, "STATUS_CHANGE_NOT_ALLOWED",
                 "You are not allowed to perform this status change");
+    }
+
+    @ExceptionHandler(InvalidIssueStatusTransitionException.class)
+    ResponseEntity<ApiError> invalidStatusTransition(InvalidIssueStatusTransitionException exception) {
+        return error(HttpStatus.CONFLICT, "INVALID_STATUS_TRANSITION",
+                "Issue status can only change from NEW to IN_PROGRESS and from IN_PROGRESS to CLOSED");
     }
 
     private static ResponseEntity<ApiError> error(HttpStatus status, String code, String message) {
