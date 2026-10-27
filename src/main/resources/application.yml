@@ -10,6 +10,16 @@ spring:
       ddl-auto: none
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        spring.json.add.type.headers: false
+
+events:
+  issue-topic: ${ISSUE_EVENTS_TOPIC:dormsupport.issue-events}
 
 services:
   auth-uri: ${AUTH_SERVICE_URI:http://auth-service:8080}

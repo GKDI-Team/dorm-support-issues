@@ -4,6 +4,7 @@ import com.dormsupport.issues.category.IssueCategory;
 import com.dormsupport.issues.category.IssueCategoryRepository;
 import com.dormsupport.issues.client.AuthServiceClient;
 import com.dormsupport.issues.client.AuthUserProfile;
+import com.dormsupport.issues.event.IssueEventPublisher;
 import com.dormsupport.issues.history.IssueStatusHistory;
 import com.dormsupport.issues.history.IssueStatusHistoryRepository;
 import org.springframework.security.core.Authentication;
@@ -21,15 +22,18 @@ public class IssueService {
     private final IssueCategoryRepository categoryRepository;
     private final IssueStatusHistoryRepository historyRepository;
     private final AuthServiceClient authServiceClient;
+    private final IssueEventPublisher issueEventPublisher;
 
     public IssueService(IssueRepository issueRepository,
                         IssueCategoryRepository categoryRepository,
                         IssueStatusHistoryRepository historyRepository,
-                        AuthServiceClient authServiceClient) {
+                        AuthServiceClient authServiceClient,
+                        IssueEventPublisher issueEventPublisher) {
         this.issueRepository = issueRepository;
         this.categoryRepository = categoryRepository;
         this.historyRepository = historyRepository;
         this.authServiceClient = authServiceClient;
+        this.issueEventPublisher = issueEventPublisher;
     }
 
     @Transactional
@@ -53,6 +57,7 @@ public class IssueService {
                 category,
                 request.locationDetails().trim()));
         historyRepository.save(new IssueStatusHistory(issue, null, IssueStatus.NEW, userId));
+        issueEventPublisher.publishCreated(issue);
         return IssueResponse.from(issue);
     }
 
@@ -100,6 +105,7 @@ public class IssueService {
         issueRepository.save(issue);
         historyRepository.save(new IssueStatusHistory(
                 issue, previousStatus, request.status(), userId(authentication)));
+        issueEventPublisher.publishStatusChanged(issue, previousStatus);
         return IssueDetailsResponse.from(issue, historyRepository.findByIssueIdOrderByChangedAtAsc(issueId));
     }
 
