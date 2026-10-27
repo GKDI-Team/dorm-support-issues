@@ -1,5 +1,3 @@
-// TODO: Test publishing issue.created and issue.status_changed after transaction commit.
-// TODO: Test Kafka send success, timeout and failure logging.
 package com.dormsupport.issues.event;
 
 import com.dormsupport.issues.category.IssueCategory;

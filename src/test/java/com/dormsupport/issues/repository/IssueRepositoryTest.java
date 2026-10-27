@@ -1,4 +1,3 @@
-// TODO: Test issue persistence, resident visibility, status filtering and ordering.
 package com.dormsupport.issues.repository;
 
 import com.dormsupport.issues.category.IssueCategory;

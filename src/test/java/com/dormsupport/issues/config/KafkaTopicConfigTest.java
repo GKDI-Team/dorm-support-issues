@@ -1,4 +1,3 @@
-// TODO: Test the issue events topic name, partition count and replication settings.
 package com.dormsupport.issues.config;
 
 import org.apache.kafka.clients.admin.NewTopic;

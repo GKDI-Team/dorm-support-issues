@@ -1,5 +1,3 @@
-// TODO: Test category persistence and the unique category name constraint.
-
 package com.dormsupport.issues.repository;
 
 import com.dormsupport.issues.category.IssueCategory;
