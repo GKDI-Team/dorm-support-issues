@@ -132,7 +132,7 @@ components:
       properties:
         id: { type: string, format: uuid }
         residentId: { type: string, format: uuid }
-        blockId: { type: string, format: uuid }
+        block: { type: string, example: "11111111" }
         roomNumber: { type: string }
         title: { type: string }
         description: { type: string }

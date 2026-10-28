@@ -29,8 +29,8 @@ public class Issue {
     @Column(name = "resident_id", nullable = false)
     private UUID residentId;
 
-    @Column(name = "block_id", nullable = false)
-    private UUID blockId;
+    @Column(nullable = false, length = 50)
+    private String block;
 
     @Column(name = "room_number", nullable = false, length = 20)
     private String roomNumber;
@@ -63,16 +63,23 @@ public class Issue {
         // Required by JPA.
     }
 
-    public Issue(UUID residentId, UUID blockId, String roomNumber, String title,
+    public Issue(UUID residentId, String block, String roomNumber, String title,
                  String description, IssueCategory category, String locationDetails) {
         this.residentId = residentId;
-        this.blockId = blockId;
+        this.block = block;
         this.roomNumber = roomNumber;
         this.title = title;
         this.description = description;
         this.category = category;
         this.locationDetails = locationDetails;
         this.status = IssueStatus.NEW;
+    }
+
+    /** Compatibility constructor for existing test fixtures. */
+    public Issue(UUID residentId, UUID blockId, String roomNumber, String title,
+                 String description, IssueCategory category, String locationDetails) {
+        this(residentId, blockId == null ? null : blockId.toString(), roomNumber,
+                title, description, category, locationDetails);
     }
 
     @PrePersist
@@ -102,8 +109,18 @@ public class Issue {
         return residentId;
     }
 
+    public String getBlock() {
+        return block;
+    }
+
+    /** @deprecated use {@link #getBlock()} */
+    @Deprecated
     public UUID getBlockId() {
-        return blockId;
+        try {
+            return block == null ? null : UUID.fromString(block);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 
     public String getRoomNumber() {

@@ -18,7 +18,7 @@ SET id = EXCLUDED.id,
 -- User and block IDs are identifiers owned by other services; issues-service
 -- deliberately does not maintain local user or block tables.
 INSERT INTO issues (
-    id, resident_id, block_id, room_number, title, description,
+    id, resident_id, block, room_number, title, description,
     category_id, status, location_details, created_at, updated_at
 )
 VALUES
@@ -48,7 +48,7 @@ VALUES
     )
 ON CONFLICT (id) DO UPDATE SET
     resident_id = EXCLUDED.resident_id,
-    block_id = EXCLUDED.block_id,
+    block = EXCLUDED.block,
     room_number = EXCLUDED.room_number,
     title = EXCLUDED.title,
     description = EXCLUDED.description,

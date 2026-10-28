@@ -123,7 +123,7 @@ class IssueServiceTest {
                         "resident",
                         "Test Resident",
                         "RESIDENT",
-                        null,
+                        (String) null,
                         "101",
                         Instant.parse("2026-01-10T10:00:00Z")
                 ));

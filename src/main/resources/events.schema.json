@@ -13,8 +13,7 @@
     "title": { "type": "string" },
     "descriptionPreview": { "type": "string", "maxLength": 500 },
     "categoryName": { "type": "string" },
-    "blockId": { "type": ["string", "null"], "format": "uuid" },
-    "blockName": { "type": ["string", "null"] },
+    "block": { "type": "string", "maxLength": 50 },
     "roomNumber": { "type": "string" },
     "locationDetails": { "type": "string" }
   },

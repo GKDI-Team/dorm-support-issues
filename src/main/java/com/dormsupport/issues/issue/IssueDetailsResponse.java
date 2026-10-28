@@ -9,7 +9,7 @@ import java.util.UUID;
 public record IssueDetailsResponse(
         UUID id,
         UUID residentId,
-        UUID blockId,
+        String block,
         String roomNumber,
         String title,
         String description,
@@ -21,11 +21,22 @@ public record IssueDetailsResponse(
         Instant updatedAt,
         List<StatusHistoryResponse> statusHistory) {
 
+    /** Compatibility constructor for existing test fixtures. */
+    public IssueDetailsResponse(UUID id, UUID residentId, UUID blockId, String roomNumber,
+                                String title, String description, UUID categoryId,
+                                String categoryName, IssueStatus status, String locationDetails,
+                                Instant createdAt, Instant updatedAt,
+                                List<StatusHistoryResponse> statusHistory) {
+        this(id, residentId, blockId == null ? null : blockId.toString(), roomNumber,
+                title, description, categoryId, categoryName, status, locationDetails,
+                createdAt, updatedAt, statusHistory);
+    }
+
     public static IssueDetailsResponse from(Issue issue, List<IssueStatusHistory> history) {
         return new IssueDetailsResponse(
                 issue.getId(),
                 issue.getResidentId(),
-                issue.getBlockId(),
+                issue.getBlock(),
                 issue.getRoomNumber(),
                 issue.getTitle(),
                 issue.getDescription(),

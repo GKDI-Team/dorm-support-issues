@@ -15,24 +15,44 @@ public record IssueEvent(
         Instant occurredAt,
         String title,
         String descriptionPreview,
-        UUID blockId,
+        String block,
         String roomNumber,
         String locationDetails,
         String categoryName) {
 
+    /** Compatibility constructor for existing test fixtures. */
+    public IssueEvent(UUID eventId, String eventType, UUID issueId, IssueStatus status,
+                      IssueStatus previousStatus, Instant occurredAt, String title,
+                      String descriptionPreview, UUID blockId, String roomNumber,
+                      String locationDetails, String categoryName) {
+        this(eventId, eventType, issueId, status, previousStatus, occurredAt, title,
+                descriptionPreview, blockId == null ? null : blockId.toString(),
+                roomNumber, locationDetails, categoryName);
+    }
+
     public static IssueEvent created(Issue issue) {
         return new IssueEvent(UUID.randomUUID(), "issue.created", issue.getId(), issue.getStatus(), null,
-                Instant.now(), issue.getTitle(), preview(issue.getDescription()), issue.getBlockId(),
+                Instant.now(), issue.getTitle(), preview(issue.getDescription()), issue.getBlock(),
                 issue.getRoomNumber(), issue.getLocationDetails(), issue.getCategory().getName());
     }
 
     public static IssueEvent statusChanged(Issue issue, IssueStatus previousStatus) {
         return new IssueEvent(UUID.randomUUID(), "issue.status_changed", issue.getId(), issue.getStatus(),
-                previousStatus, Instant.now(), issue.getTitle(), preview(issue.getDescription()), issue.getBlockId(),
+                previousStatus, Instant.now(), issue.getTitle(), preview(issue.getDescription()), issue.getBlock(),
                 issue.getRoomNumber(), issue.getLocationDetails(), issue.getCategory().getName());
     }
 
     private static String preview(String description) {
         return description.length() <= 500 ? description : description.substring(0, 500);
+    }
+
+    /** Compatibility accessor for old consumers and tests. */
+    @Deprecated
+    public UUID blockId() {
+        try {
+            return block == null ? null : UUID.fromString(block);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 }

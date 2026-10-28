@@ -42,7 +42,8 @@ public class IssueService {
         requireRole(authentication, "RESIDENT");
 
         AuthUserProfile profile = authServiceClient.getUserProfile(userId);
-        if (profile.blockId() == null || profile.roomNumber() == null || profile.roomNumber().isBlank()) {
+        if (profile.block() == null || profile.block().isBlank()
+                || profile.roomNumber() == null || profile.roomNumber().isBlank()) {
             throw new ResidentProfileIncompleteException();
         }
 
@@ -50,7 +51,7 @@ public class IssueService {
                 .orElseThrow(IssueCategoryNotFoundException::new);
         Issue issue = issueRepository.save(new Issue(
                 userId,
-                profile.blockId(),
+                profile.block(),
                 profile.roomNumber(),
                 request.title().trim(),
                 request.description().trim(),

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS issue_categories (
 CREATE TABLE IF NOT EXISTS issues (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     resident_id UUID NOT NULL,
-    block_id UUID NOT NULL,
+    block VARCHAR(50) NOT NULL,
     room_number VARCHAR(20) NOT NULL,
     title VARCHAR(150) NOT NULL,
     description TEXT NOT NULL,
