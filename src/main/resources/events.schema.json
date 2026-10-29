@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DormSupport issue event",
+  "type": "object",
+  "required": ["eventId", "eventType", "issueId", "occurredAt"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "type": "string", "enum": ["issue.created", "issue.status_changed"] },
+    "issueId": { "type": "string", "format": "uuid" },
+    "status": { "type": "string", "enum": ["NEW", "IN_PROGRESS", "CLOSED"] },
+    "previousStatus": { "type": ["string", "null"], "enum": ["NEW", "IN_PROGRESS", "CLOSED", null] },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "title": { "type": "string" },
+    "descriptionPreview": { "type": "string", "maxLength": 500 },
+    "categoryName": { "type": "string" },
+    "block": { "type": "string", "maxLength": 50 },
+    "roomNumber": { "type": "string" },
+    "locationDetails": { "type": "string" }
+  },
+  "additionalProperties": false
+}

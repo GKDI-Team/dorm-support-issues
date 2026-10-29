@@ -1,0 +1,160 @@
+openapi: 3.0.3
+info:
+  title: DormSupport Issues API
+  version: 0.1.0
+  description: Categories, repair requests and status transitions for the MVP.
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: Issues
+paths:
+  /health:
+    get:
+      tags: [Issues]
+      summary: Service health
+      responses:
+        '200': { description: Service is available }
+  /api/v1/categories:
+    get:
+      tags: [Issues]
+      summary: List issue categories
+      responses:
+        '200':
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Category' }
+  /api/v1/issues:
+    get:
+      tags: [Issues]
+      summary: List issues available to the current user
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [NEW, IN_PROGRESS, CLOSED] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 }, description: Number of issues to return }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, maximum: 100000, default: 0 }, description: Number of issues to skip }
+      responses:
+        '200':
+          description: Issue list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Issue' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [Issues]
+      summary: Create an issue for the current resident
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateIssueRequest' }
+      responses:
+        '201':
+          description: Issue created with NEW status
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Issue' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { description: Invalid status transition }
+  /api/v1/issues/{issueId}:
+    get:
+      tags: [Issues]
+      summary: Get one issue
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - { name: issueId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Issue
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Issue' }
+        '404': { description: Issue not found }
+  /api/v1/issues/{issueId}/status:
+    patch:
+      tags: [Issues]
+      summary: Change issue status
+      security: [{ BearerAuth: [] }]
+      parameters:
+        - { name: issueId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ChangeStatusRequest' }
+      responses:
+        '200':
+          description: Status changed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Issue' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { description: Issue not found }
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    CreateIssueRequest:
+      type: object
+      required: [title, description, categoryId, locationDetails]
+      additionalProperties: false
+      properties:
+        title: { type: string, minLength: 1, maxLength: 150 }
+        description: { type: string, minLength: 1, maxLength: 5000 }
+        categoryId: { type: string, format: uuid }
+        locationDetails: { type: string, minLength: 1, maxLength: 250 }
+    ChangeStatusRequest:
+      type: object
+      required: [status]
+      additionalProperties: false
+      properties:
+        status: { type: string, enum: [NEW, IN_PROGRESS, CLOSED] }
+    Category:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+    Issue:
+      type: object
+      required: [id, title, description, categoryId, status, locationDetails, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        residentId: { type: string, format: uuid }
+        block: { type: string, example: "11111111" }
+        roomNumber: { type: string }
+        title: { type: string }
+        description: { type: string }
+        categoryId: { type: string, format: uuid }
+        categoryName: { type: string }
+        locationDetails: { type: string }
+        status: { type: string, enum: [NEW, IN_PROGRESS, CLOSED] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: Missing, invalid or expired JWT
+    Forbidden:
+      description: Current role cannot perform this operation

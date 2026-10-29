@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: issues-service-test
+
+  datasource:
+    # Testcontainers starts an isolated PostgreSQL container for this test JVM.
+    url: jdbc:tc:postgresql:17-alpine:///issues_test
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/init.sql
+      data-locations: classpath:db/test-data.sql
+
+  kafka:
+    # Kafka integration tests override this property with their Testcontainers broker address.
+    bootstrap-servers: ${KAFKA_TEST_BOOTSTRAP_SERVERS:localhost:9092}
+    admin:
+      fail-fast: false
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 0
+      properties:
+        spring.json.add.type.headers: false
+
+services:
+  auth-uri: http://localhost:18081
+
+auth:
+  jwt:
+    # Test-only secret. Never reuse it outside the test profile.
+    secret: issues-service-test-only-secret-do-not-use-in-production
+
+events:
+  issue-topic: issues-service-test.issue-events
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    enabled: false
