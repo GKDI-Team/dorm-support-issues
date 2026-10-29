@@ -51,9 +51,9 @@ CREATE INDEX IF NOT EXISTS ix_issue_status_history_issue_changed_at
 
 INSERT INTO issue_categories (name, description)
 VALUES
-    ('Plumbing', 'Problems with taps, pipes and water supply'),
-    ('Electricity', 'Problems with lamps, sockets and wiring'),
-    ('Furniture', 'Broken or damaged furniture'),
-    ('Heating', 'Problems with heating or radiators'),
-    ('Other', 'Other dormitory problems')
+    ('Водопровод', 'Проблемы с кранами, трубами и водоснабжением'),
+    ('Электричество', 'Проблемы с лампами, розетками и проводкой'),
+    ('Мебель', 'Сломанная или поврежденная мебель'),
+    ('Отопление', 'Проблемы с отоплением или радиаторами'),
+    ('Другое', 'Другие проблемы с общежитием')
 ON CONFLICT (name) DO NOTHING;
