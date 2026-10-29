@@ -20,61 +20,61 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class ApiExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ApiError> validation(MethodArgumentNotValidException exception) {
-        return error(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Request data is invalid");
+        return error(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Данные запроса заполнены некорректно");
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     ResponseEntity<ApiError> constraintViolation(ConstraintViolationException exception) {
-        return error(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Request data is invalid");
+        return error(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Данные запроса заполнены некорректно");
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
     ResponseEntity<ApiError> methodValidation(HandlerMethodValidationException exception) {
-        return error(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Request parameters are invalid");
+        return error(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Параметры запроса указаны некорректно");
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     ResponseEntity<ApiError> argumentTypeMismatch(MethodArgumentTypeMismatchException exception) {
-        return error(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Request parameters are invalid");
+        return error(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "Параметры запроса указаны некорректно");
     }
 
     @ExceptionHandler(IssueCategoryNotFoundException.class)
     ResponseEntity<ApiError> categoryNotFound(IssueCategoryNotFoundException exception) {
-        return error(HttpStatus.NOT_FOUND, "CATEGORY_NOT_FOUND", "Issue category was not found");
+        return error(HttpStatus.NOT_FOUND, "CATEGORY_NOT_FOUND", "Категория заявки не найдена");
     }
 
     @ExceptionHandler(IssueNotFoundException.class)
     ResponseEntity<ApiError> issueNotFound(IssueNotFoundException exception) {
-        return error(HttpStatus.NOT_FOUND, "ISSUE_NOT_FOUND", "Issue was not found");
+        return error(HttpStatus.NOT_FOUND, "ISSUE_NOT_FOUND", "Заявка не найдена");
     }
 
     @ExceptionHandler(UserProfileNotFoundException.class)
     ResponseEntity<ApiError> userNotFound(UserProfileNotFoundException exception) {
-        return error(HttpStatus.UNAUTHORIZED, "USER_NOT_FOUND", "Authenticated user was not found");
+        return error(HttpStatus.UNAUTHORIZED, "USER_NOT_FOUND", "Пользователь не найден. Войдите в систему ещё раз");
     }
 
     @ExceptionHandler(AuthServiceUnavailableException.class)
     ResponseEntity<ApiError> authUnavailable(AuthServiceUnavailableException exception) {
         return error(HttpStatus.SERVICE_UNAVAILABLE, "AUTH_SERVICE_UNAVAILABLE",
-                "Auth service is temporarily unavailable");
+                "Сервис авторизации временно недоступен. Попробуйте позже");
     }
 
     @ExceptionHandler(ResidentProfileIncompleteException.class)
     ResponseEntity<ApiError> incompleteProfile(ResidentProfileIncompleteException exception) {
         return error(HttpStatus.BAD_REQUEST, "PROFILE_INCOMPLETE",
-                "Resident profile must contain block and room");
+                "В профиле жильца должны быть указаны блок и комната");
     }
 
     @ExceptionHandler(IssueStatusChangeNotAllowedException.class)
     ResponseEntity<ApiError> statusChangeNotAllowed(IssueStatusChangeNotAllowedException exception) {
         return error(HttpStatus.FORBIDDEN, "STATUS_CHANGE_NOT_ALLOWED",
-                "You are not allowed to perform this status change");
+                "У вас нет прав на изменение статуса этой заявки");
     }
 
     @ExceptionHandler(InvalidIssueStatusTransitionException.class)
     ResponseEntity<ApiError> invalidStatusTransition(InvalidIssueStatusTransitionException exception) {
         return error(HttpStatus.CONFLICT, "INVALID_STATUS_TRANSITION",
-                "Issue status can only change from NEW to IN_PROGRESS and from IN_PROGRESS to CLOSED");
+                "Нельзя пропускать этапы: меняйте статус последовательно — «Новая» → «В работе» → «Закрыта».");
     }
 
     private static ResponseEntity<ApiError> error(HttpStatus status, String code, String message) {
